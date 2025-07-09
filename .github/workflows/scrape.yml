@@ -1,0 +1,32 @@
+name: Daily Google Play Review Scraper
+
+on:
+  schedule:
+    - cron: '0 23 * * *'  # UTC 기준, 한국 오전 8시
+  workflow_dispatch:  # 수동 실행도 가능
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install google-play-scraper pandas
+
+      - name: Run scraper
+        run: python daily_scraper.py
+
+      - name: Upload results artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: scraped-reviews
+          path: reviews_*.csv
