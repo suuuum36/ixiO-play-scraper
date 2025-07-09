@@ -3,15 +3,15 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# 앱 패키지명
-package_name = 'com.lguplus.aicallagent'
-
 # 날짜 설정
 today = datetime.now()
 today_str = today.strftime('%Y-%m-%d')
 midnight = datetime(today.year, today.month, today.day)
 
-# 수집
+# 앱 패키지명
+package_name = 'com.lguplus.aicallagent'
+
+# Google Play에서 리뷰 수집 (최대 1000개)
 result, _ = reviews(
     package_name,
     lang='ko',
@@ -20,15 +20,15 @@ result, _ = reviews(
     count=1000
 )
 
-# 신규 리뷰 필터링
-new_reviews = []
+# 전체 리뷰 전처리
 for r in result:
     r['scraped_date'] = today_str
     r['review_date'] = r['at'].strftime('%Y-%m-%d')
-    if r['at'] >= midnight:
-        new_reviews.append(r)
 
-# 신규 리뷰 DataFrame
+# 오늘 날짜만 필터링
+new_reviews = [r for r in result if r['at'] >= midnight]
+
+# ✅ 신규 리뷰 블록 만들기
 if new_reviews:
     new_df = pd.DataFrame(new_reviews)
     new_df = new_df[['review_date', 'userName', 'score', 'content', 'scraped_date']]
@@ -43,16 +43,15 @@ else:
         'scraped_date': today_str
     }])
 
-# 기존 누적 리뷰 불러오기
-filename = f'reviews_{today_str}.csv'
-if os.path.exists(filename):
-    existing_df = pd.read_csv(filename)
-else:
-    existing_df = pd.DataFrame(columns=['status', 'review_date', 'userName', 'score', 'content', 'scraped_date'])
+# ✅ 전체 리뷰 DataFrame 생성
+all_df = pd.DataFrame(result)
+all_df = all_df[['review_date', 'userName', 'score', 'content', 'scraped_date']]
+all_df.insert(0, 'status', '📦 전체 리뷰')
 
-# 새로운 리뷰를 맨 위에, 기존 리뷰 아래에 붙이기
-final_df = pd.concat([new_df, existing_df], ignore_index=True)
+# ✅ 최종 결합: 상단에 신규 리뷰, 하단에 전체 리뷰
+final_df = pd.concat([new_df, all_df], ignore_index=True)
 
 # 저장
+filename = f'reviews_{today_str}.csv'
 final_df.to_csv(filename, index=False)
-print(f"[INFO] 전체 리뷰 데이터 저장 완료: {filename}")
+print(f"[INFO] 리뷰 CSV 저장 완료: {filename}")
