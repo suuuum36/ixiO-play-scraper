@@ -2,7 +2,7 @@ name: Daily Google Play Review Scraper
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 매일 오전 8시 KST (UTC 기준 23시)
+    - cron: '0 5 * * *'  # 한국 오후 2시 (KST)
   workflow_dispatch:
 
 jobs:
