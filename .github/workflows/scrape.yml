@@ -2,8 +2,8 @@ name: Daily Google Play Review Scraper
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # UTC 기준, 한국 오전 8시
-  workflow_dispatch:  # 수동 실행도 가능
+    - cron: '0 23 * * *'  # UTC 기준 (한국 오전 8시)
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Upload results artifact
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scraped-reviews
           path: reviews_*.csv
