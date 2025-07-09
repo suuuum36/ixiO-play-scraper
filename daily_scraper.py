@@ -1,8 +1,6 @@
-# daily_scraper.py
 from google_play_scraper import Sort, reviews
 import pandas as pd
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 
 # 앱 패키지명
 package_name = 'com.lguplus.aicallagent'
@@ -29,11 +27,23 @@ for r in result:
     if r['at'] >= midnight:
         filtered.append(r)
 
+# 저장 파일 이름
+filename = f'reviews_{today_str}.csv'
+
 # 저장
 if filtered:
     df = pd.DataFrame(filtered)
-    filename = f'reviews_{today_str}.csv'
     df[['at', 'review_date', 'userName', 'score', 'content', 'scraped_date']].to_csv(filename, index=False)
-    print(f"[SUCCESS] {len(filtered)} reviews saved to {filename}")
+    print(f"[SUCCESS] 신규 리뷰 {len(filtered)}건 저장 완료: {filename}")
 else:
-    print("[INFO] No new reviews found today.")
+    # 신규 리뷰 없을 때 메시지 저장
+    df = pd.DataFrame([{
+        'at': '',
+        'review_date': today_str,
+        'userName': '',
+        'score': '',
+        'content': '오늘 신규 리뷰가 없어요',
+        'scraped_date': today_str
+    }])
+    df.to_csv(filename, index=False)
+    print(f"[INFO] 신규 리뷰 없음. 메시지 저장됨: {filename}")
