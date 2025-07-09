@@ -44,7 +44,7 @@ else:
     }])
 
 # 기존 누적 리뷰 불러오기
-filename = 'all_reviews.csv'
+filename = f'reviews_{today_str}.csv'
 if os.path.exists(filename):
     existing_df = pd.read_csv(filename)
 else:
