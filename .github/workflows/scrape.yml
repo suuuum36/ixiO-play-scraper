@@ -2,7 +2,7 @@ name: Daily Google Play Review Scraper
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 매일 오전 8시 (KST)
+    - cron: '0 23 * * *'  # 매일 오전 8시 KST (UTC 기준 23시)
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pip install google-play-scraper pandas requests
 
-      - name: Run scraper with Slack notification
+      - name: Run scraper
         run: python daily_scraper.py
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
